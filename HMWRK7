@@ -1,0 +1,47 @@
+from os import listdir, getcwd
+# Напишите декоратор для превращения функции print в генератор html-тегов
+# Декоратор должен принимать список тегов italic, bold, underline
+# Результатом работы декоратора с аргументами italic, bold должно быть преобразование из строки вида "test string" в "<i><b>test string</b></i>"
+
+def str_to_html(tags):
+    def decorator(func):
+        tag_base = {
+            "italic": f"<i>%text%</i>",
+            "bold": f"<b>%text%</b>",
+            "underline": f"<u>%text%</u>",
+        }
+        def wrapper(text):
+            for tag in tags[::-1]:
+                text = tag_base[tag].replace('%text%', text)
+            return text
+        return wrapper
+    return decorator
+
+
+@str_to_html(["italic", "bold"])
+def get_text(text):
+    return text
+
+print(get_text('Hello'))
+
+
+# Напишите функцию, которая возвращает список файлов из директории.
+# Напишите декоратор для этой функции, который прочитает все файлы с
+# раширением .log из найденных
+
+def log_reading(func):
+    def wrapper(dir):
+        logs_list = []
+        for file in func(dir):
+            if file[-4:] == '.log':
+                logs_list.append(file)
+        return logs_list
+    return wrapper
+
+
+@log_reading
+def get_files(dir: str = ''):
+    file_list = listdir(dir)
+    return file_list
+
+print(get_files(getcwd()))
